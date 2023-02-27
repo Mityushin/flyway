@@ -95,7 +95,7 @@ public class ClickHouseDatabase extends Database<ClickHouseConnection>
                     "    success Bool" +
                     ")" +
                     " ENGINE = ReplicatedMergeTree(" +
-                    "   '/clickhouse/tables/{shard}/" + tableName + "'," +
+                    "   '/data/clickhouse/tables/{database}/{table}/'," +
                     "   '{replica}'" +
                     " )" +
                     " PARTITION BY tuple()" +
