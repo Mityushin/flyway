@@ -80,7 +80,9 @@ public class ClickHouseDatabase extends Database<ClickHouseConnection>
         String clusterName = PluginRegister.getPlugin(ClickHouseConfigurationExtension.class).getClusterName();
 
         if (StringUtils.hasText(clusterName)) {
-            return "CREATE TABLE IF NOT EXISTS " + table + "_local ON CLUSTER " + clusterName + "(" +
+            String tableName = table.getName();
+            String localTableNameQuoted = quote(tableName + "_local");
+            return "CREATE TABLE IF NOT EXISTS " + localTableNameQuoted + " ON CLUSTER " + clusterName + "(" +
                     "    installed_rank Int32," +
                     "    version String," +
                     "    description String," +
@@ -93,7 +95,7 @@ public class ClickHouseDatabase extends Database<ClickHouseConnection>
                     "    success Bool" +
                     ")" +
                     " ENGINE = ReplicatedMergeTree(" +
-                    "   '/clickhouse/tables/{shard}/" + table.getName() + "'," +
+                    "   '/clickhouse/tables/{shard}/" + tableName + "'," +
                     "   '{replica}'" +
                     " )" +
                     " PARTITION BY tuple()" +
@@ -111,7 +113,7 @@ public class ClickHouseDatabase extends Database<ClickHouseConnection>
                     "    execution_time Int32," +
                     "    success Bool" +
                     ")" + " ENGINE = Distributed(" + clusterName + ", " + table.getSchema() +
-                    ", " + table.getName() + "_local, 1);";
+                    ", " + localTableNameQuoted + ", 1);";
         } else {
             return "CREATE TABLE IF NOT EXISTS " + table + "(" +
                     "    installed_rank Int32," +

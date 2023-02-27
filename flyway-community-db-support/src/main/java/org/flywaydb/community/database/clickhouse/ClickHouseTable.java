@@ -18,6 +18,8 @@ package org.flywaydb.community.database.clickhouse;
 import lombok.CustomLog;
 import org.flywaydb.core.internal.database.base.Table;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
+import org.flywaydb.core.internal.plugin.PluginRegister;
+import org.flywaydb.core.internal.util.StringUtils;
 
 import java.sql.SQLException;
 
@@ -36,7 +38,14 @@ public class ClickHouseTable extends Table<ClickHouseDatabase, ClickHouseSchema>
 
     @Override
     protected void doDrop() throws SQLException {
-        jdbcTemplate.executeStatement("DROP TABLE " + database.quote(schema.getName(), name));
+        String clusterName = PluginRegister.getPlugin(ClickHouseConfigurationExtension.class).getClusterName();
+        String sql;
+        if (StringUtils.hasText(clusterName)) {
+            sql = "DROP TABLE " + database.quote(schema.getName(), name) + " ON CLUSTER " + clusterName;
+        } else {
+            sql = "DROP TABLE " + database.quote(schema.getName(), name);
+        }
+        jdbcTemplate.executeStatement(sql);
     }
 
     @Override
