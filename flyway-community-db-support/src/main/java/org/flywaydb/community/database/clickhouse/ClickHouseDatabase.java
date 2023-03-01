@@ -9,8 +9,7 @@ import org.flywaydb.core.internal.util.StringUtils;
 
 import java.sql.Connection;
 
-public class ClickHouseDatabase extends Database<ClickHouseConnection>
-{
+public class ClickHouseDatabase extends Database<ClickHouseConnection> {
     @Override
     public boolean useSingleConnection() {
         return true;
@@ -77,7 +76,7 @@ public class ClickHouseDatabase extends Database<ClickHouseConnection>
                 ")";
 
         if (isClustered) {
-            script += " ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/{database}/{table}', '{replica}')" +
+            script += " ENGINE = ReplicatedMergeTree('/data/clickhouse/tables/{database}/{table}/', '{replica}')" +
                     " PARTITION BY tuple()" +
                     " ORDER BY (installed_rank);";
         } else {
